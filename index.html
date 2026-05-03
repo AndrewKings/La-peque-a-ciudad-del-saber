@@ -102,7 +102,47 @@
     const PWD = "1234";
     const auth = () => prompt("Clave:") === PWD;
 
-    let obraData = { bitacora: [], inventario: [], planos: [], seguridad: [] };
+    let obraData = {
+        bitacora: [
+            {
+                "t": "27/04/2026 | Fase de Alistamiento Técnico",
+                "d": "Inicio de gestión administrativa: legalización de pólizas y activación de anticipos. Vinculación del equipo de trabajo y socialización de seguridad. Inspección técnica en sitio: verificación de los 14 soportes metálicos cimentados por obra civil. Inicio de preparación de madera: selección, corte y lijado inicial de pilares para gazebos con aplicación de primera capa de lasur protector[cite: 351]."
+            },
+            {
+                "t": "04/05/2026 | Semana 1: Inicio Oficial y Tratamiento",
+                "d": "Arranque operativo a las 07:00 AM con reunión de seguridad. Validación de inventario de materiales (cemento y geotextil). Reporte al interventor de materiales críticos: Pilares de Teka (15x15 cm) y Soportes HR[cite: 379]. Ejecución de tratamiento masivo de vigas 2x6\" y 2x4\" mediante cepillado, lijado (grano 60-100) y sellado con Barniz Lasur color Teka[cite: 364, 381]."
+            },
+            {
+                "t": "11/05/2026 | Semana 2: Montaje Estructural de Pilares",
+                "d": "Elevación y plomado de los 14 pilares sobre anclajes metálicos. Ejecución de pernado definitivo utilizando 28 pernos pasantes y 56 tirafondos hexagonales de 5/16\"[cite: 381]. Verificación de niveles y alineación vertical supervisada por interventoría antes del cierre de fase estructural[cite: 361, 370]."
+            },
+            {
+                "t": "18/05/2026 | Semana 3: Estructura Principal de Cubierta",
+                "d": "Montaje de vigas soleras y estructura radial para gazebos octogonal (8m) y hexagonal (4m)[cite: 361, 366]. Instalación de vigas principales de pino y refuerzos estructurales para estabilidad sísmica, manteniendo la coherencia con el diseño pedagógico Waldorf y la ingeniería STEAM[cite: 366]."
+            },
+            {
+                "t": "25/05/2026 | Semana 4: Estructura Secundaria y Huerto",
+                "d": "Instalación de vigas secundarias y listonado para soporte de techumbre. Inicio de la construcción de la estructura del huerto pedagógico, incluyendo la cimentación de pilares para las 4 camas de cultivo de 1.22 x 2.44 m[cite: 361, 370]."
+            },
+            {
+                "t": "01/06/2026 | Semana 5: Impermeabilización y Techumbre",
+                "d": "Instalación de tableros OSB estructurales de 11mm. Aplicación de manto impermeabilizante autoadhesivo y colocación de teja asfáltica (Shingle) color negro[cite: 361, 387]. Cierre de cúpulas de ventilación para garantizar la protección climática total de las áreas[cite: 366]."
+            },
+            {
+                "t": "08/06/2026 | Semana 6: Cerramientos y Seguridad",
+                "d": "Fabricación e instalación de rejas en madera (90 metros lineales aprox.) y dos puertas de acceso con marco metálico[cite: 361, 370]. Avance en el cerramiento de fibrocemento para la zona del huerto y fijación de travesaños de seguridad[cite: 370]."
+            },
+            {
+                "t": "15/06/2026 | Semana 7: Carpintería Fina y Mobiliario",
+                "d": "Construcción del arenero estructural y finalización de las camas de cultivo con cierre en fibrocemento[cite: 370, 371]. Aplicación de acabados finales y segunda mano de protección UV. Ensamblaje de estaciones de juego y mobiliario Montessori según el dossier técnico[cite: 361, 371]."
+            },
+            {
+                "t": "22/06/2026 | Semana 8: Entrega y Limpieza Final",
+                "d": "Retiro de residuos de obra y organización de herramientas. Inspección final de uniones, estabilidad y acabados estéticos. Entrega formal del proyecto 'La Pequeña Ciudad del Saber' tras cumplir el ciclo de 8 semanas de ejecución[cite: 361, 371]."
+            }
+        ],
+        inventario: [], planos: [], seguridad: []
+    };
 
     async function loadData() {
         toggleLoading(true);
