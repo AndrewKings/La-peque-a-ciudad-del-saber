@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Ciudad del Saber - Cloud V1.0</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #1a252f; --secondary: #d35400; --accent: #27ae60; --bg: #f0f2f5; --white: #ffffff; --text: #2c3e50; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 80px; }
+        header { background: var(--primary); color: white; padding: 2rem 1rem; text-align: center; border-bottom: 6px solid var(--secondary); }
+        .nav-tabs { display: flex; background: white; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow-x: auto; }
+        .tab-btn { flex: 1; padding: 1.2rem; border: none; background: none; cursor: pointer; font-weight: bold; color: #7f8c8d; min-width: 140px; transition: 0.3s; border-bottom: 4px solid transparent; }
+        .tab-btn.active { color: var(--secondary); border-bottom-color: var(--secondary); background: #fffaf5; }
+        .container { max-width: 1000px; margin: 1.5rem auto; padding: 0 1rem; }
+        .card { background: white; border-radius: 15px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #e1e4e8; box-shadow: 0 4px 6px rgba(0,0,0,0.02); position: relative; }
+        .timeline-item { border-left: 3px solid var(--secondary); padding-left: 20px; margin-bottom: 1.5rem; position: relative; }
+        .timeline-item::before { content: ''; position: absolute; left: -9px; top: 0; width: 15px; height: 15px; background: var(--secondary); border-radius: 50%; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; }
+        .high { background: #fee2e2; color: #dc2626; }
+        .done { background: #dcfce7; color: #16a34a; }
+        #admin-trigger { position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; border: none; cursor: pointer; z-index: 2000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-size: 1.5rem; }
+        #admin-panel { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #2d3436; color: white; padding: 2rem; z-index: 2100; border-top: 5px solid var(--secondary); max-height: 80vh; overflow-y: auto; border-radius: 25px 25px 0 0; }
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+        input, textarea, select { width: 100%; padding: 12px; margin-top: 8px; border-radius: 8px; border: 1px solid #444; background: #3d4446; color: white; margin-bottom: 1rem; box-sizing: border-box; }
+        .btn-save { background: var(--secondary); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1rem; }
+        .tab-content { display: none; }
+        .active-content { display: block; }
+        .action-btns { display: flex; gap: 10px; }
+        .delete-btn { color: #e74c3c; cursor: pointer; }
+        .edit-btn { color: #3498db; cursor: pointer; }
+        #cloud-status { position: fixed; top: 10px; right: 10px; padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; z-index: 4000; background: #95a5a6; color: white; }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5000; display: none; }
+    </style>
+</head>
+<body>
+
+<div id="cloud-status">DESCONECTADO</div>
+<div id="loading-overlay"><i class="fas fa-sync fa-spin fa-3x" style="color:var(--secondary)"></i><br><p>Sincronizando con la nube...</p></div>
+
+<header>
+    <h1>CIUDAD DEL SABER: CENTRO DE MANDO</h1>
+    <p><i class="fas fa-tools"></i> Andrés Reyes | Dirección Técnica de Obra</p>
+</header>
+
+<nav class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('inicio')">Bitácora</button>
+    <button class="tab-btn" onclick="switchTab('inventario')">Inventario</button>
+    <button class="tab-btn" onclick="switchTab('planos')">Planos</button>
+    <button class="tab-btn" onclick="switchTab('seguridad')">Seguridad</button>
+</nav>
+
+<div class="container">
+    <div id="inicio" class="tab-content active-content"><div class="card"><h2>Avances Recientes</h2><div id="timeline-list"></div></div></div>
+    <div id="inventario" class="tab-content"><div class="card"><h2>Control de Materiales</h2><div style="overflow-x:auto;"><table><thead><tr><th>Ítem</th><th>Cant.</th><th>Especificación</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="inventory-list"></tbody></table></div></div></div>
+    <div id="planos" class="tab-content"><div class="card"><h2>Documentos Técnicos</h2><div id="files-list"></div></div></div>
+    <div id="seguridad" class="tab-content"><div class="card"><h2>Protocolos EPP</h2><div id="safety-list"></div></div></div>
+</div>
+
+<button id="admin-trigger" onclick="openAdmin()"><i class="fas fa-cog"></i></button>
+
+<div id="admin-panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="color:var(--secondary); margin:0;">Editor: <span id="admin-title">Bitácora</span></h2>
+        <button onclick="closeAdmin()" style="background:none; border:none; color:white; font-size:1.8rem; cursor:pointer;">&times;</button>
+    </div>
+    <input type="hidden" id="edit-index" value="-1">
+
+    <div id="editor-inicio" class="form-section active">
+        <input type="text" id="adm-t-titulo" placeholder="Título del hito">
+        <textarea id="adm-t-desc" rows="3" placeholder="Descripción detallada..."></textarea>
+        <button class="btn-save" onclick="save('bitacora')">Guardar en Nube</button>
+    </div>
+
+    <div id="editor-inventario" class="form-section">
+        <input type="text" id="adm-i-nombre" placeholder="Material">
+        <input type="text" id="adm-i-cant" placeholder="Cantidad (ej: 20 un)">
+        <input type="text" id="adm-i-spec" placeholder="Especificación">
+        <select id="adm-i-status"><option value="high">Pendiente</option><option value="done">En Obra</option></select>
+        <button class="btn-save" onclick="save('inventario')">Guardar en Nube</button>
+    </div>
+
+    <div id="editor-planos" class="form-section">
+        <input type="text" id="adm-f-nombre" placeholder="Nombre Lámina">
+        <input type="text" id="adm-f-link" placeholder="Link (Drive/PDF)">
+        <button class="btn-save" onclick="save('planos')">Guardar en Nube</button>
+    </div>
+
+    <div id="editor-seguridad" class="form-section">
+        <input type="text" id="adm-s-titulo" placeholder="Norma/EPP">
+        <textarea id="adm-s-desc" rows="3" placeholder="Protocolo..."></textarea>
+        <button class="btn-save" onclick="save('seguridad')">Guardar en Nube</button>
+    </div>
+</div>
+
+<script>
+    const BIN_ID = "69f6b3ecaaba88219765441b";
+    const API_KEY = "$2a$10$Cso6jrLjc9gwvvlvuIHlPOjkhEZwB2jzeGNhiq7A5RiqpGqjiCZ1O";
+    const PWD = "1234";
+    const auth = () => prompt("Clave:") === PWD;
+
+    let obraData = { bitacora: [], inventario: [], planos: [], seguridad: [] };
+
+    async function loadData() {
+        toggleLoading(true);
+        try {
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                headers: { "X-Master-Key": API_KEY }
+            });
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            obraData = data.record;
+            setStatus("CONECTADO", "#27ae60");
+            render();
+        } catch (e) {
+            setStatus("ERROR DE CONEXIÓN", "#e74c3c");
+            alert("No se pudo conectar con la nube. Verifica tu API Key.");
+        }
+        toggleLoading(false);
+    }
+
+    async function syncCloud() {
+        toggleLoading(true);
+        try {
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method: 'PUT',
+                headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+                body: JSON.stringify(obraData)
+            });
+            if (res.ok) setStatus("SINCRONIZADO", "#27ae60");
+        } catch (e) { alert("Error al guardar en la nube"); }
+        toggleLoading(false);
+    }
+
+    function render() {
+        document.getElementById('timeline-list').innerHTML = obraData.bitacora.map((b, i) => `
+            <div class="timeline-item">
+                <div style="display:flex; justify-content:space-between"><strong>${b.t}</strong>
+                <div class="action-btns"><i class="fas fa-edit edit-btn" onclick="prepareEdit('bitacora', ${i})"></i><i class="fas fa-trash delete-btn" onclick="del('bitacora', ${i})"></i></div></div>
+                <p style="font-size:0.9rem; color:#666;">${b.d}</p>
+            </div>`).reverse().join('');
+
+        document.getElementById('inventory-list').innerHTML = obraData.inventario.map((m, i) => `
+            <tr>
+                <td><strong>${m.n}</strong></td><td>${m.c}</td><td><small>${m.s}</small></td>
+                <td><span class="badge ${m.st}">${m.st === 'high' ? 'PEND' : 'OBRA'}</span></td>
+                <td><div class="action-btns"><i class="fas fa-edit edit-btn" onclick="prepareEdit('inventario', ${i})"></i><i class="fas fa-trash delete-btn" onclick="del('inventario', ${i})"></i></div></td>
+            </tr>`).join('');
+
+        document.getElementById('files-list').innerHTML = obraData.planos.map((f, i) => `
+            <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                <span><i class="far fa-file-pdf" style="color:#e74c3c"></i> ${f.n}</span>
+                <div class="action-btns"><a href="${f.l}" target="_blank" style="color:var(--secondary); font-weight:bold; text-decoration:none;">VER</a>
+                <i class="fas fa-edit edit-btn" onclick="prepareEdit('planos', ${i})"></i><i class="fas fa-trash delete-btn" onclick="del('planos', ${i})"></i></div>
+            </div>`).join('');
+
+        document.getElementById('safety-list').innerHTML = obraData.seguridad.map((s, i) => `
+            <div class="card" style="border-left: 5px solid var(--accent);">
+                <div style="display:flex; justify-content:space-between"><strong>${s.t}</strong>
+                <div class="action-btns"><i class="fas fa-edit edit-btn" onclick="prepareEdit('seguridad', ${i})"></i><i class="fas fa-trash delete-btn" onclick="del('seguridad', ${i})"></i></div></div>
+                <p style="font-size:0.9rem; margin-top:8px;">${s.d}</p>
+            </div>`).join('');
+    }
+
+    async function save(type) {
+        const idx = parseInt(document.getElementById('edit-index').value);
+        let item = {};
+        if(type==='bitacora') item = {t: document.getElementById('adm-t-titulo').value, d: document.getElementById('adm-t-desc').value};
+        if(type==='inventario') item = {n: document.getElementById('adm-i-nombre').value, c: document.getElementById('adm-i-cant').value, s: document.getElementById('adm-i-spec').value, st: document.getElementById('adm-i-status').value};
+        if(type==='planos') item = {n: document.getElementById('adm-f-nombre').value, l: document.getElementById('adm-f-link').value};
+        if(type==='seguridad') item = {t: document.getElementById('adm-s-titulo').value, d: document.getElementById('adm-s-desc').value};
+
+        if(idx === -1) obraData[type].push(item); else obraData[type][idx] = item;
+        await syncCloud();
+        render();
+        closeAdmin();
+    }
+
+    function prepareEdit(type, i) {
+        if (!auth()) return;
+        document.getElementById('edit-index').value = i;
+        openAdmin(true); switchTab(type);
+        const item = obraData[type][i];
+        if(type==='bitacora') { document.getElementById('adm-t-titulo').value = item.t; document.getElementById('adm-t-desc').value = item.d; }
+        if(type==='inventario') { document.getElementById('adm-i-nombre').value = item.n; document.getElementById('adm-i-cant').value = item.c; document.getElementById('adm-i-spec').value = item.s; document.getElementById('adm-i-status').value = item.st; }
+        if(type==='planos') { document.getElementById('adm-f-nombre').value = item.n; document.getElementById('adm-f-link').value = item.l; }
+        if(type==='seguridad') { document.getElementById('adm-s-titulo').value = item.t; document.getElementById('adm-s-desc').value = item.d; }
+    }
+
+    function switchTab(id) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active-content'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active-content');
+        document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('editor-'+id).classList.add('active');
+        document.getElementById('admin-title').innerText = id.toUpperCase();
+    }
+
+    function openAdmin(skip=false) { if(skip || auth()) document.getElementById('admin-panel').style.display='block'; }
+    function closeAdmin() { document.getElementById('admin-panel').style.display='none'; document.getElementById('edit-index').value="-1"; document.querySelectorAll('input, textarea').forEach(i => i.value=''); }
+    
+    async function del(type, i) {
+        if (!auth()) return;
+        if (confirm("¿Estás seguro de que deseas eliminar este elemento?")) {
+            obraData[type].splice(i, 1);
+            await syncCloud();
+            render();
+        }
+    }
+    function setStatus(text, color) { const s = document.getElementById('cloud-status'); s.innerText = text; s.style.background = color; }
+    function toggleLoading(show) { document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none'; }
+
+    loadData();
+</script>
+</body>
+</html>
