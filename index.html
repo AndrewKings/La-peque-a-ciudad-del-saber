@@ -219,15 +219,39 @@
         closeAdmin();
     }
 
-    function prepareEdit(type, i) {
+   function prepareEdit(type, i) {
         if (!auth()) return;
+        
+        // 1. Seteamos el índice de lo que vamos a editar
         document.getElementById('edit-index').value = i;
-        openAdmin(true); switchTab(type);
+        
+        // 2. Cambiamos a la pestaña correcta del editor
+        switchTab(type); 
+        
+        // 3. Abrimos el panel visualmente
+        document.getElementById('admin-panel').style.display = 'block';
+        
+        // 4. Cargamos los datos del objeto 'item' en los inputs
         const item = obraData[type][i];
-        if(type==='bitacora') { document.getElementById('adm-t-titulo').value = item.t; document.getElementById('adm-t-desc').value = item.d; }
-        if(type==='inventario') { document.getElementById('adm-i-nombre').value = item.n; document.getElementById('adm-i-cant').value = item.c; document.getElementById('adm-i-spec').value = item.s; document.getElementById('adm-i-status').value = item.st; }
-        if(type==='planos') { document.getElementById('adm-f-nombre').value = item.n; document.getElementById('adm-f-link').value = item.l; }
-        if(type==='seguridad') { document.getElementById('adm-s-titulo').value = item.t; document.getElementById('adm-s-desc').value = item.d; }
+        
+        if(type==='bitacora') { 
+            document.getElementById('adm-t-titulo').value = item.t; 
+            document.getElementById('adm-t-desc').value = item.d; 
+        }
+        if(type==='inventario') { 
+            document.getElementById('adm-i-nombre').value = item.n; 
+            document.getElementById('adm-i-cant').value = item.c; 
+            document.getElementById('adm-i-spec').value = item.s; 
+            document.getElementById('adm-i-status').value = item.st; 
+        }
+        if(type==='planos') { 
+            document.getElementById('adm-f-nombre').value = item.n; 
+            document.getElementById('adm-f-link').value = item.l; 
+        }
+        if(type==='seguridad') { 
+            document.getElementById('adm-s-titulo').value = item.t; 
+            document.getElementById('adm-s-desc').value = item.d; 
+        }
     }
 
     function switchTab(id) {
