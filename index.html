@@ -47,14 +47,14 @@
 </header>
 
 <nav class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('inicio')">Bitácora</button>
-    <button class="tab-btn" onclick="switchTab('inventario')">Inventario</button>
-    <button class="tab-btn" onclick="switchTab('planos')">Planos</button>
-    <button class="tab-btn" onclick="switchTab('seguridad')">Seguridad</button>
+    <button id="tab-btn-bitacora" class="tab-btn active" onclick="switchTab('bitacora')">Bitácora</button>
+    <button id="tab-btn-inventario" class="tab-btn" onclick="switchTab('inventario')">Inventario</button>
+    <button id="tab-btn-planos" class="tab-btn" onclick="switchTab('planos')">Planos</button>
+    <button id="tab-btn-seguridad" class="tab-btn" onclick="switchTab('seguridad')">Seguridad</button>
 </nav>
 
 <div class="container">
-    <div id="inicio" class="tab-content active-content"><div class="card"><h2>Avances Recientes</h2><div id="timeline-list"></div></div></div>
+    <div id="bitacora" class="tab-content active-content"><div class="card"><h2>Avances Recientes</h2><div id="timeline-list"></div></div></div>
     <div id="inventario" class="tab-content"><div class="card"><h2>Control de Materiales</h2><div style="overflow-x:auto;"><table><thead><tr><th>Ítem</th><th>Cant.</th><th>Especificación</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="inventory-list"></tbody></table></div></div></div>
     <div id="planos" class="tab-content"><div class="card"><h2>Documentos Técnicos</h2><div id="files-list"></div></div></div>
     <div id="seguridad" class="tab-content"><div class="card"><h2>Protocolos EPP</h2><div id="safety-list"></div></div></div>
@@ -69,7 +69,7 @@
     </div>
     <input type="hidden" id="edit-index" value="-1">
 
-    <div id="editor-inicio" class="form-section active">
+    <div id="editor-bitacora" class="form-section active">
         <input type="text" id="adm-t-titulo" placeholder="Título del hito">
         <textarea id="adm-t-desc" rows="3" placeholder="Descripción detallada..."></textarea>
         <button class="btn-save" onclick="save('bitacora')">Guardar en Nube</button>
@@ -257,6 +257,10 @@
     function switchTab(id) {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active-content'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        const btn = document.getElementById('tab-btn-' + id);
+        if (btn) btn.classList.add('active');
+
         document.getElementById(id).classList.add('active-content');
         document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
         document.getElementById('editor-'+id).classList.add('active');
